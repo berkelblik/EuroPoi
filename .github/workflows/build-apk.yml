@@ -1,0 +1,63 @@
+name: Build EuroPoi APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout broncode
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Dependencies installeren
+        run: npm install --legacy-peer-deps
+
+      - name: React app bouwen
+        run: npm run build
+
+      - name: Capacitor sync
+        run: npx cap sync android
+
+      - name: Gradle uitvoerrechten
+        run: chmod +x android/gradlew
+
+      - name: APK bouwen
+        run: |
+          cd android
+          ./gradlew assembleDebug --no-daemon
+
+      - name: APK uploaden als artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EuroPoi-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+      - name: GitHub Release aanmaken
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: "EuroPoi build ${{ github.run_number }}"
+          body: "Automatisch gebouwde APK — ${{ github.event.head_commit.message }}"
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
