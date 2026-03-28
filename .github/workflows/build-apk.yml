@@ -31,10 +31,11 @@ jobs:
       - name: Dependencies installeren
         run: npm install --legacy-peer-deps
 
+      - name: Uitvoerrechten node binaries
+        run: chmod +x node_modules/.bin/*
+
       - name: React app bouwen
-        run: |
-          chmod +x node_modules/.bin/react-scripts
-          npm run build
+        run: npm run build
 
       - name: Capacitor sync
         run: npx cap sync android
