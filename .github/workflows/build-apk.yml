@@ -32,7 +32,9 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: React app bouwen
-        run: npm run build
+        run: |
+          chmod +x node_modules/.bin/react-scripts
+          npm run build
 
       - name: Capacitor sync
         run: npx cap sync android
