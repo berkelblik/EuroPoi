@@ -2,7 +2,7 @@ import { useMemo, useRef } from "react";
 import { Z } from "../config";
 import { relAng, clockDir, bear } from "../geoUtils";
 
-const BELL_URL = "/bike-bell-40094.mp3";
+const BELL_URL = process.env.PUBLIC_URL + "/bike-bell-40094.mp3";
 
 const EcoScreen = ({ ppois, loc, tick, onClose }) => {
   const activePoi = useMemo(

@@ -405,7 +405,7 @@ export default function App() {
       >
         <div className="w-44 h-44 mb-8 rounded-[3rem] overflow-hidden shadow-[0_0_80px_rgba(59,130,246,.4)] border-4 border-blue-500/30">
           <img
-            src="/EuroPoiLogo.png"
+            src={process.env.PUBLIC_URL + "/EuroPoiLogo.png"}
             alt="EuroPoi"
             className="w-full h-full object-cover"
           />
@@ -446,7 +446,7 @@ export default function App() {
         >
           <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg pointer-events-none border border-white/20">
             <img
-              src="/EuroPoiLogo.png"
+              src={process.env.PUBLIC_URL + "/EuroPoiLogo.png"}
               alt="EuroPoi"
               className="w-full h-full object-cover"
             />

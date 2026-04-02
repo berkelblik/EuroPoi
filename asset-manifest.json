@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/EuroPoi/static/js/main.e9175a8a.js",
+    "main.js": "/EuroPoi/static/js/main.57a73f26.js",
     "index.html": "/EuroPoi/index.html",
-    "main.e9175a8a.js.map": "/EuroPoi/static/js/main.e9175a8a.js.map"
+    "main.57a73f26.js.map": "/EuroPoi/static/js/main.57a73f26.js.map"
   },
   "entrypoints": [
-    "static/js/main.e9175a8a.js"
+    "static/js/main.57a73f26.js"
   ]
 }
