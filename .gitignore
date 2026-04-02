@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Android build bestanden
+android/
+build/
+
+# Omgevingsbestanden
+.env
+.env.local
+.env.production
+
+# Systeem
+.DS_Store
+Thumbs.db

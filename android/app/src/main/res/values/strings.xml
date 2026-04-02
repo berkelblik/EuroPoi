@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">EuroPoi</string>
-    <string name="title_activity_main">EuroPoi</string>
-    <string name="package_name">com.pdrukker.europoi</string>
-    <string name="custom_url_scheme">com.pdrukker.europoi</string>
-</resources>
