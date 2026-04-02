@@ -204,20 +204,33 @@ export default function App() {
   // ── Boot ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     Audio$.onSpeak(setSpeaking);
-    // Native TTS plugin beschikbaarheidscheck bij opstart
+    // Native plugin checks en statusbalk verbergen bij opstart
     setTimeout(() => {
       const cap = window.Capacitor;
       const isNative =
         cap &&
         typeof cap.isNativePlatform === "function" &&
         cap.isNativePlatform();
-      const hasPlugin = !!cap?.Plugins?.NativeTTS;
+
+      // StatusBar verbergen in APK
+      if (isNative) {
+        try {
+          cap.Plugins?.StatusBar?.hide?.();
+          cap.Plugins?.StatusBar?.setOverlaysWebView?.({ overlay: true });
+        } catch (_) {}
+        try {
+          cap.Plugins?.NavigationBar?.hide?.();
+        } catch (_) {}
+      }
+
+      const hasTTS = !!cap?.Plugins?.TextToSpeech;
+      const hasGeo = !!cap?.Plugins?.Geolocation;
       addLog(
-        `Platform: ${isNative ? "Native Android" : "Browser"} | NativeTTS: ${
-          hasPlugin ? "beschikbaar" : "ONTBREEKT"
-        }`
+        `Platform: ${isNative ? "Native Android" : "Browser"} | TTS: ${
+          hasTTS ? "OK" : "ONTBREEKT"
+        } | Geo: ${hasGeo ? "OK" : "ONTBREEKT"}`
       );
-    }, 2000);
+    }, 1000);
     Audio$.setLog((msg) => {
       const s = String(msg || "");
       const safe =
@@ -817,6 +830,7 @@ export default function App() {
               key={p.id}
               poi={p}
               t={t}
+              elevenCfg={elevenCfg}
               cooldown={tick - (triggered[p.id] || 0) < CFG.cooldownMs}
               highlight={highlightId === p.id}
               cardRef={(el) => {

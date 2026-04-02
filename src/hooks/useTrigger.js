@@ -47,7 +47,7 @@ export function useTrigger({
             p.lng,
             route
           );
-          if (triggerPt && isFinite(poiToRoute)) {
+          if (triggerPt && isFinite(poiToRoute) && poiToRoute >= 0) {
             dist = hav(safeLoc.lat, safeLoc.lng, triggerPt[0], triggerPt[1]);
             routeEffR = Math.max(effR, poiToRoute + 50);
           }
@@ -60,7 +60,7 @@ export function useTrigger({
           effR: routeEffR,
           useRouteTrigger,
           poiToRoute: useRouteTrigger
-            ? distToPolyline(p.lat, p.lng, route).dist
+            ? (() => { const d = distToPolyline(p.lat, p.lng, route).dist; return isFinite(d) ? d : null; })()
             : null,
           match:
             (p.name || "").toLowerCase().includes(q) ||

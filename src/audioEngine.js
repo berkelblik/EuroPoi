@@ -43,8 +43,8 @@ const Audio$ = (() => {
     } catch (_) {}
     try {
       const c = window.Capacitor;
-      if (c?.isNativePlatform?.() && c.Plugins?.NativeTTS)
-        c.Plugins.NativeTTS.stop();
+      if (c?.isNativePlatform?.() && c.Plugins?.TextToSpeech)
+        c.Plugins.TextToSpeech.stop();
     } catch (_) {}
     sp(false);
   };
@@ -71,30 +71,41 @@ const Audio$ = (() => {
     } catch (_) {}
   };
 
-  // Native Android TTS via JavascriptInterface (window.AndroidTTS)
+  // Native TTS via @capacitor-community/text-to-speech plugin
   const nativeTts = (text, lang) =>
     new Promise((done) => {
-      // Probeer window.AndroidTTS — beschikbaar in APK via addJavascriptInterface
-      const bridge = window.AndroidTTS;
-      log(`AndroidTTS check: ${typeof bridge} speak=${typeof bridge?.speak}`);
-      if (!bridge || typeof bridge.speak !== "function") {
-        log("AndroidTTS niet beschikbaar");
+      const cap = window.Capacitor;
+      const isNative = cap?.isNativePlatform?.();
+      const ttsPlugin = cap?.Plugins?.TextToSpeech;
+      log(`NativeTTS check: native=${isNative} plugin=${!!ttsPlugin}`);
+      if (!isNative || !ttsPlugin?.speak) {
+        log("TextToSpeech plugin niet beschikbaar");
         done(false);
         return;
       }
       try {
         sp(true);
-        log(`AndroidTTS.speak: "${text.slice(0, 40)}"`);
-        bridge.speak(text, lang || "nl-NL");
-        const woorden = (text || "").split(" ").length;
-        const ms = Math.max(2000, woorden * 450);
-        log(`AndroidTTS wacht ${ms}ms`);
-        setTimeout(() => {
-          sp(false);
-          done(true);
-        }, ms);
+        log(`TextToSpeech.speak: "${text.slice(0, 40)}"`);
+        ttsPlugin
+          .speak({
+            text: text,
+            lang: lang || "nl-NL",
+            rate: 1.0,
+            pitch: 1.0,
+            volume: 1.0,
+            category: "ambient",
+          })
+          .then(() => {
+            sp(false);
+            done(true);
+          })
+          .catch((e) => {
+            log(`TextToSpeech fout: ${e.message || e}`);
+            sp(false);
+            done(false);
+          });
       } catch (e) {
-        log(`AndroidTTS fout: ${e.message}`);
+        log(`TextToSpeech fout: ${e.message}`);
         sp(false);
         done(false);
       }
@@ -330,6 +341,7 @@ const Audio$ = (() => {
       log("play() start _playNow");
       return _playNow(text, opts).finally(() => {
         busy = false;
+        sp(false); // Garandeer dat Stop Spraak knop verdwijnt na afloop
         processQueue();
       });
     }
@@ -347,6 +359,7 @@ const Audio$ = (() => {
         .then(() => _playNow(text, opts))
         .finally(() => {
           busy = false;
+          sp(false); // Garandeer dat Stop Spraak knop verdwijnt na afloop
           processQueue();
         });
     }

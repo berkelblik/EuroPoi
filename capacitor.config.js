@@ -24,13 +24,21 @@ const config = {
       showSpinner: false,
     },
     StatusBar: {
-      style: "Dark", // lichte icoontjes op donkere achtergrond
+      style: "Dark",
       backgroundColor: "#020a1a",
-      overlaysWebView: false, // verberg de statusbalk volledig
+      overlaysWebView: false,
     },
     NavigationBar: {
       backgroundColor: "#020a1a",
-      darkButtons: false, // lichte knoppen
+      darkButtons: false,
+    },
+    // Fused Location Provider instellingen
+    BackgroundGeolocation: {
+      // Notification voor Android foreground service
+      // (vereist zodat Android de app niet throttelt)
+      notificationTitle: "EuroPoi navigeert",
+      notificationText: "GPS actief",
+      notificationIconColor: "#3b82f6",
     },
   },
 };

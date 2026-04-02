@@ -76,7 +76,8 @@ const LeafletMap = ({
   useEffect(() => {
     if (!umarkRef.current || !isNum(loc.lat)) return;
     umarkRef.current.setLatLng([loc.lat, loc.lng]);
-    if (follow && mapRef.current) mapRef.current.panTo([loc.lat, loc.lng]);
+    if (follow && mapRef.current && isNum(loc.lat) && isNum(loc.lng))
+      mapRef.current.panTo([loc.lat, loc.lng]);
   }, [loc, follow]);
 
   // POI markers & cirkels
@@ -91,7 +92,7 @@ const LeafletMap = ({
     marksRef.current = {};
     circsRef.current = {};
     pois.forEach((p) => {
-      if (!isNum(p.lat)) return;
+      if (!isNum(p.lat) || !isNum(p.lng)) return;
       const isHL = p.id === highlightId;
       const isRoute = p.useRouteTrigger;
       const inRange = p.dist <= (p.effR || 100);
@@ -136,7 +137,7 @@ const LeafletMap = ({
       });
       marksRef.current[p.id] = m;
       const ci = window.L.circle([p.lat, p.lng], {
-        radius: Math.min(p.effR || 100, 50000),
+        radius: Math.min(Number.isFinite(p.effR) && p.effR > 0 ? p.effR : 100, 50000),
         stroke: isHL || isRoute,
         color: isHL ? "#facc15" : isRoute ? "#3b82f6" : "transparent",
         weight: isRoute ? 1.5 : 2,
@@ -167,14 +168,22 @@ const LeafletMap = ({
     if (!mapRef.current || !window.L) return;
     if (routeRef.current) mapRef.current.removeLayer(routeRef.current);
     if (trackRef.current) mapRef.current.removeLayer(trackRef.current);
-    if (route.length > 0)
-      routeRef.current = window.L.polyline(route, {
+    const validRoute = route.filter(
+      (p) => Array.isArray(p) && typeof p[0] === "number" && typeof p[1] === "number" &&
+             isFinite(p[0]) && isFinite(p[1])
+    );
+    const validTrack = track.filter(
+      (p) => Array.isArray(p) && typeof p[0] === "number" && typeof p[1] === "number" &&
+             isFinite(p[0]) && isFinite(p[1])
+    );
+    if (validRoute.length > 1)
+      routeRef.current = window.L.polyline(validRoute, {
         color: "#3b82f6",
         weight: 4,
         opacity: 0.7,
       }).addTo(mapRef.current);
-    if (track.length > 0)
-      trackRef.current = window.L.polyline(track, {
+    if (validTrack.length > 1)
+      trackRef.current = window.L.polyline(validTrack, {
         color: "#f87171",
         weight: 3,
         dashArray: "6 10",

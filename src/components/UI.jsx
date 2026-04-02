@@ -117,26 +117,44 @@ export const PushBtn = ({ children, cls = "", ...p }) => (
 );
 
 // ─── AUDIO BRON BADGE — kleuren komen overeen met hiërarchie in Instellingen ──
-export const AudioSourceBadge = ({ poi, t }) => {
-  if (poi.audioUrl)
+export const AudioSourceBadge = ({ poi, elevenCfg, t }) => {
+  const hasUrl = !!poi.audioUrl;
+  const hasBulk = !!(poi.audioBulk || poi.audioBulk === true);
+  const hasData = !!(poi.audioData || poi.audioData === true);
+  const hasEleven = !!(elevenCfg?.apiKey?.trim().length > 10 && elevenCfg?.voiceId?.trim());
+
+  if (hasUrl)
     return (
       <span className="text-[9px] font-black uppercase bg-blue-900/60 text-blue-300 border border-blue-700/40 px-1.5 py-0.5 rounded-full">
         {t.audioSrc1}
       </span>
     );
-  if (poi.audioBulk || poi.audioBulk === true)
+  if (hasBulk)
     return (
       <span className="text-[9px] font-black uppercase bg-emerald-900/60 text-emerald-400 border border-emerald-700/40 px-1.5 py-0.5 rounded-full">
         {t.audioSrc2}
       </span>
     );
-  if (poi.audioData || poi.audioData === true)
+  if (hasData)
     return (
       <span className="text-[9px] font-black uppercase bg-amber-900/60 text-amber-400 border border-amber-700/40 px-1.5 py-0.5 rounded-full">
         {t.audioSrc3}
       </span>
     );
-  return null;
+  // 4. ElevenLabs — tonen als er géén audiobestand is maar wel een geldige API-key
+  if (hasEleven)
+    return (
+      <span className="text-[9px] font-black bg-[#111] text-[#f5a623] border border-[#f5a623]/40 px-1.5 py-0.5 rounded-full flex items-center gap-1">
+        <span className="text-[8px] font-black tracking-tighter">II</span>
+        ElevenLabs
+      </span>
+    );
+  // 5. Telefoon TTS als enige fallback
+  return (
+    <span className="text-[9px] font-black uppercase bg-slate-800/60 text-slate-400 border border-slate-600/40 px-1.5 py-0.5 rounded-full">
+      {t.audioSrc5}
+    </span>
+  );
 };
 
 // ─── POI KAART ─────────────────────────────────────────────────────────────
@@ -148,6 +166,7 @@ export const PoiCard = ({
   cooldown,
   highlight,
   cardRef,
+  elevenCfg,
   t,
 }) => {
   const km = Math.floor((poi.dist || 0) / 1000);
@@ -212,7 +231,9 @@ export const PoiCard = ({
           >
             {poi.categories?.[0] || "—"}
           </span>
-          {!highlight && <AudioSourceBadge poi={poi} t={t} />}
+          {!highlight && (
+            <AudioSourceBadge poi={poi} elevenCfg={elevenCfg} t={t} />
+          )}
         </div>
         {/* Afstand */}
         <div

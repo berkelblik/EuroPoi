@@ -77,7 +77,7 @@ export const CFG = {
   db: { name: "EuroPoi_v6", version: 1, store: "pois" },
   cooldownMs: 10 * 60 * 1000,
   defaultCoords: { lat: 52.9735, lng: 4.6806, heading: 0 },
-  trackMinDist: 2,
+  trackMinDist: 8,
   trackPauseMs: 3000,
 };
 

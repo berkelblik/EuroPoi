@@ -359,7 +359,7 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
   }, [gpxWarn, pois, addLog, setTriggered]);
 
   // ── Track opslaan als GPX ───────────────────────────────────────────────
-  const saveTrack = useCallback(() => {
+  const saveTrack = useCallback(async () => {
     if (!track.length) {
       addLog("Geen track");
       return;
@@ -368,16 +368,48 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
       .map((p) => `<trkpt lat="${p[0]}" lon="${p[1]}"></trkpt>`)
       .join("");
     const gpx = `<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="EuroPoi"><trk><n>Track ${new Date().toLocaleString()}</n><trkseg>${pts}</trkseg></trk></gpx>`;
+    const fileName = `track_${Date.now()}.gpx`;
+
+    // Capacitor APK: gebruik Filesystem + Share
+    const cap = window.Capacitor;
+    const isNative = cap?.isNativePlatform?.();
+    if (isNative && cap.Plugins?.Filesystem && cap.Plugins?.Share) {
+      try {
+        await cap.Plugins.Filesystem.writeFile({
+          path: fileName,
+          data: btoa(unescape(encodeURIComponent(gpx))),
+          directory: "CACHE",
+          encoding: null,
+        });
+        const { uri } = await cap.Plugins.Filesystem.getUri({
+          path: fileName,
+          directory: "CACHE",
+        });
+        await cap.Plugins.Share.share({
+          title: "EuroPoi track",
+          text: "GPS track opgeslagen",
+          url: uri,
+          dialogTitle: "Sla track op als…",
+        });
+        addLog(`Track opgeslagen: ${track.length} punten`);
+        return;
+      } catch (err) {
+        addLog(`Track opslaan fout: ${err.message}`);
+      }
+    }
+
+    // Browser fallback
     const a = Object.assign(document.createElement("a"), {
       href: URL.createObjectURL(
         new Blob([gpx], { type: "application/gpx+xml" })
       ),
-      download: `track_${Date.now()}.gpx`,
+      download: fileName,
+      style: "display:none",
     });
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
-    addLog("Track opgeslagen");
+    setTimeout(() => document.body.removeChild(a), 1000);
+    addLog(`Track opgeslagen: ${track.length} punten`);
   }, [track, addLog]);
 
   return {
