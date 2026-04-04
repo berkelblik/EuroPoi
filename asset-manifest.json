@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.js": "/EuroPoi/static/js/main.e9175a8a.js",
-    "index.html": "/EuroPoi/index.html",
-    "main.e9175a8a.js.map": "/EuroPoi/static/js/main.e9175a8a.js.map"
+    "main.js": "/static/js/main.e9175a8a.js",
+    "index.html": "/index.html",
+    "main.e9175a8a.js.map": "/static/js/main.e9175a8a.js.map"
   },
   "entrypoints": [
     "static/js/main.e9175a8a.js"
