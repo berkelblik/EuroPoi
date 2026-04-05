@@ -24,12 +24,11 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
   const exportCSV = useCallback(
     async (ppois) => {
       const src = ppois && ppois.length ? ppois : pois;
-      // Puntkomma-gescheiden, geen aanhalingstekens om tekstvelden.
-      // Puntkomma's en regeleinden binnen tekstvelden worden gesaneerd
-      // (vervangen door komma resp. spatie) zodat de parser nooit breekt.
+      // CSV-export: puntkomma als scheidingsteken, tekstvelden omsloten door dubbele
+      // aanhalingstekens, interne aanhalingstekens verdubbeld (RFC 4180).
       const esc = (s) =>
         (s || "")
-          .replace(/;/g, ",")
+          .replace(/"/g, '""')
           .replace(/[\r\n\t]/g, " ")
           .trim();
       // Meerdere categorieën per POI: één rij per categorie (zoals het bronbestand)
@@ -42,15 +41,16 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
           // lat/lng facultatief — pluscode is verplicht en leidend
           const lat = p.lat != null ? p.lat : "";
           const lng = p.lng != null ? p.lng : "";
+          const q = (s) => `"${esc(s)}"`;
           rows.push(
-            `${lat};${lng};${p.pluscode};${esc(p.name)};${esc(p.desc)};${esc(
+            `${lat};${lng};${q(p.pluscode)};${q(p.name)};${q(p.desc)};${q(
               cat
-            )};${p.radius || 0};${esc(p.audioUrl || "")}`
+            )};${p.radius || 0};${q(p.audioUrl || "")}`
           );
         }
       }
       const csv =
-        "lat;lng;pluscode;name;desc;category;radius;MP3\r\n" +
+        "lat;lng;pluscode;name;desc;category;radius;mp3\r\n" +
         rows.join("\r\n");
 
       // Capacitor APK: gebruik Filesystem + Share
