@@ -588,13 +588,15 @@ export default function App() {
             className={showMap ? "text-violet-600" : "text-slate-400"}
           />
         </button>
-        <button
-          onClick={() => setSheet("route")}
-          style={{ touchAction: "none" }}
-          className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all touch-none bg-white/90 shadow-[0_5px_0_#0f766e,0_6px_8px_rgba(0,0,0,.45)] active:shadow-[0_2px_0_#0f766e] active:translate-y-[3px]"
-        >
-          <Route size={18} className="text-teal-600" />
-        </button>
+        {adminMode && (
+          <button
+            onClick={() => setSheet("route")}
+            style={{ touchAction: "none" }}
+            className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all touch-none bg-white/90 shadow-[0_5px_0_#0f766e,0_6px_8px_rgba(0,0,0,.45)] active:shadow-[0_2px_0_#0f766e] active:translate-y-[3px]"
+          >
+            <Route size={18} className="text-teal-600" />
+          </button>
+        )}
         <button
           onClick={toggleEco}
           style={{ touchAction: "none" }}

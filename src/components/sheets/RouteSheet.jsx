@@ -45,7 +45,7 @@ const RouteSheet = ({
         <div className="bg-white/5 p-4 rounded-2xl border border-white/8 space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-[9px] font-black uppercase text-blue-400">
-              Route (GPX &mdash; &lt;rte&gt;)
+              GPX Route invoer (route of track)
             </p>
             {route.length > 0 && (
               <span className="text-[10px] text-emerald-400 font-mono">
@@ -72,23 +72,6 @@ const RouteSheet = ({
             </div>
           )}
 
-          <p className="text-[10px] text-white/70 leading-relaxed">
-            Laad een{" "}
-            <span className="text-white/90 font-black">
-              GPX-routebestand (&lt;rte&gt;)
-            </span>{" "}
-            voor navigatie. Een routebestand bevat geplande waypoints als{" "}
-            <span className="text-blue-300 font-mono text-[9px]">
-              &lt;rtept&gt;
-            </span>{" "}
-            elementen — het formaat dat routeplanners zoals Komoot en OsmAnd
-            gebruiken. Opgenomen tracks (
-            <span className="text-amber-300 font-mono text-[9px]">
-              &lt;trkpt&gt;
-            </span>
-            ) worden apart gemeld.
-          </p>
-
           <div className="flex gap-2">
             <PushBtn
               cls="flex-1 py-3 bg-blue-700 text-white border-blue-900 text-[10px]"
@@ -112,20 +95,10 @@ const RouteSheet = ({
           </div>
         </div>
 
-        {/* ── GPX Route exporteren (nieuw) ── */}
+        {/* ── GPX Route exporteren ── */}
         <div className="bg-white/5 p-4 rounded-2xl border border-white/8 space-y-3">
           <p className="text-[9px] font-black uppercase text-teal-400">
             Route exporteren voor Komoot / OsmAnd
-          </p>
-
-          <p className="text-[10px] text-white/70 leading-relaxed">
-            Exporteer alle POI&apos;s van de{" "}
-            <span className="text-white/90 font-black">actief geselecteerde categorie</span>{" "}
-            als GPX-routebestand (
-            <span className="text-teal-300 font-mono text-[9px]">&lt;rtept&gt;</span>
-            ). De volgorde wordt bepaald via het dichtstbijzijnde-buur
-            algoritme. Startpunt: crosshair-positie &rarr; GPS-locatie &rarr;
-            meest noordwestelijke POI.
           </p>
 
           {selCats && selCats.length > 0 ? (
@@ -171,7 +144,7 @@ const RouteSheet = ({
         <div className="bg-white/5 p-4 rounded-2xl border border-white/8 space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-[9px] font-black uppercase text-amber-400">
-              Track Opname (&lt;trk&gt;)
+              Track Opname
             </p>
             <span
               className={`text-[10px] font-mono ${
@@ -185,16 +158,6 @@ const RouteSheet = ({
               {recOn ? (recPause ? t.trackPause : t.trackOn) : t.trackOff}
             </span>
           </div>
-
-          <p className="text-[10px] text-white/70 leading-relaxed">
-            Neem je eigen GPS-pad op als{" "}
-            <span className="text-amber-300 font-mono text-[9px]">
-              &lt;trkpt&gt;
-            </span>{" "}
-            track. Een track is een opgenomen rijpad — geen navigatieroute.
-            Opgeslagen in GPX 1.1 formaat, compatibel met Komoot, OsmAnd en
-            Garmin.
-          </p>
 
           <PushBtn
             cls={`w-full py-4 text-sm ${
