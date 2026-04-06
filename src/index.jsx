@@ -162,6 +162,7 @@ export default function App() {
     importBulk,
     loadGpx,
     saveTrack,
+    exportGpxRoute,
   } = useGpx({ pois, setPois, addLog, setTriggered, track });
 
   const safeLoc = loc || CFG.defaultCoords;
@@ -1018,6 +1019,11 @@ export default function App() {
         onGpxClick={() => gpxRef.current?.click()}
         saveTrack={saveTrack}
         addLog={addLog}
+        exportGpxRoute={exportGpxRoute}
+        selCats={selCats}
+        loc={loc}
+        mapCenter={mapCenter}
+        crosshairActive={crosshairActive}
       />
 
       <Confirm

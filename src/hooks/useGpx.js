@@ -9,9 +9,82 @@ import {
   normPlus,
   parseCoord,
   parseCSVLine,
-  distToPolyline,
+  hav,
 } from "../geoUtils";
 import DB from "../db";
+
+// ── GPX 1.1 namespace header (gedeeld door track én route export) ──────────
+const GPX_HEADER = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="EuroPoi"
+  xmlns="http://www.topografix.com/GPX/1/1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">`;
+
+// ── Deel-hulpfunctie (Capacitor Share + browser fallback) ─────────────────
+async function deelBestand({ inhoud, bestandsNaam, mimeType, titel, tekst, addLog }) {
+  const cap = window.Capacitor;
+  const isNative = cap?.isNativePlatform?.();
+
+  if (isNative && cap.Plugins?.Filesystem && cap.Plugins?.Share) {
+    try {
+      await cap.Plugins.Filesystem.writeFile({
+        path: bestandsNaam,
+        data: btoa(unescape(encodeURIComponent(inhoud))),
+        directory: "CACHE",
+        encoding: null,
+      });
+      const { uri } = await cap.Plugins.Filesystem.getUri({
+        path: bestandsNaam,
+        directory: "CACHE",
+      });
+      await cap.Plugins.Share.share({
+        title: titel,
+        text: tekst,
+        url: uri,
+        dialogTitle: "Delen via…",
+      });
+      return true;
+    } catch (err) {
+      addLog(`Delen fout (Capacitor): ${err.message} — probeer browser`);
+    }
+  }
+
+  // Browser fallback
+  const a = Object.assign(document.createElement("a"), {
+    href: URL.createObjectURL(new Blob([inhoud], { type: mimeType })),
+    download: bestandsNaam,
+    style: "display:none",
+  });
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => document.body.removeChild(a), 1000);
+  return true;
+}
+
+// ── Dichtstbijzijnde-buur sortering ──────────────────────────────────────
+// Sorteert een array van POIs zodanig dat je startend vanuit startLat/startLng
+// steeds naar de dichtstbijzijnde nog-niet-bezochte POI gaat.
+function sorteerDichtstbijzijndeBuur(poisLijst, startLat, startLng) {
+  if (!poisLijst.length) return [];
+  const resterend = [...poisLijst];
+  const gesorteerd = [];
+  let huidigeL = startLat;
+  let huidigeN = startLng;
+
+  while (resterend.length) {
+    let dichtstbij = 0;
+    let minDist = Infinity;
+    resterend.forEach((p, i) => {
+      const d = hav(huidigeL, huidigeN, p.lat, p.lng);
+      if (d < minDist) { minDist = d; dichtstbij = i; }
+    });
+    const gekozen = resterend.splice(dichtstbij, 1)[0];
+    gesorteerd.push(gekozen);
+    huidigeL = gekozen.lat;
+    huidigeN = gekozen.lng;
+  }
+  return gesorteerd;
+}
 
 export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
   const [route, setRoute] = useState([]);
@@ -53,56 +126,14 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
         "lat;lng;pluscode;name;desc;category;radius;mp3\r\n" +
         rows.join("\r\n");
 
-      // Capacitor APK: gebruik Filesystem + Share
-      const cap = window.Capacitor;
-      const isNative =
-        cap &&
-        typeof cap.isNativePlatform === "function" &&
-        cap.isNativePlatform();
-
-      if (isNative && cap.Plugins?.Filesystem && cap.Plugins?.Share) {
-        try {
-          const fileName = `EuroPoi_export_${Date.now()}.csv`;
-          // Schrijf naar tijdelijke cache-map
-          await cap.Plugins.Filesystem.writeFile({
-            path: fileName,
-            data: btoa(unescape(encodeURIComponent(csv))),
-            directory: "CACHE",
-            encoding: null, // binary (base64)
-          });
-          const { uri } = await cap.Plugins.Filesystem.getUri({
-            path: fileName,
-            directory: "CACHE",
-          });
-          await cap.Plugins.Share.share({
-            title: "EuroPoi export",
-            text: "EuroPoi POI-export",
-            url: uri,
-            dialogTitle: "Exporteer als…",
-          });
-          addLog(`Geëxporteerd: ${src.length} POIs`);
-          return;
-        } catch (err) {
-          addLog(`Export fout (Capacitor): ${err.message} — probeer browser`);
-        }
-      }
-
-      // Browser-fallback (Codesandbox / desktop)
-      const blob = new Blob(["\uFEFF" + csv], {
-        type: "text/csv;charset=utf-8;",
+      await deelBestand({
+        inhoud: "\uFEFF" + csv,
+        bestandsNaam: `EuroPoi_export_${Date.now()}.csv`,
+        mimeType: "text/csv;charset=utf-8",
+        titel: "EuroPoi export",
+        tekst: "EuroPoi POI-export",
+        addLog,
       });
-      const url = URL.createObjectURL(blob);
-      const a = Object.assign(document.createElement("a"), {
-        href: url,
-        download: "EuroPoi_export.csv",
-        style: "display:none",
-      });
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      }, 1000);
       addLog(`Geëxporteerd: ${src.length} POIs`);
     },
     [pois, addLog]
@@ -127,14 +158,8 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
           c.toLowerCase().replace(/"/g, "")
         );
         const ix = {
-          lat: -1,
-          lng: -1,
-          plus: -1,
-          name: -1,
-          desc: -1,
-          cat: -1,
-          rad: -1,
-          audio: -1,
+          lat: -1, lng: -1, plus: -1, name: -1,
+          desc: -1, cat: -1, rad: -1, audio: -1,
         };
         header.forEach((x, i) => {
           if (x.includes("lat")) ix.lat = i;
@@ -144,14 +169,9 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
           else if (x.includes("desc") || x.includes("besch")) ix.desc = i;
           else if (x.includes("cat")) ix.cat = i;
           else if (x.includes("rad")) ix.rad = i;
-          else if (
-            x.includes("mp3") ||
-            x.includes("audio") ||
-            x.includes("link")
-          )
+          else if (x.includes("mp3") || x.includes("audio") || x.includes("link"))
             ix.audio = i;
         });
-        // Groepeer rijen op pluscode: één CSV-rij per categorie → één POI met array
         const byPlus = new Map();
         for (const row of lines.slice(1)) {
           if (!row.trim()) continue;
@@ -161,20 +181,12 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
           let la = parseCoord(get(ix.lat)),
             lo = parseCoord(get(ix.lng));
           const plus = get(ix.plus);
-          // Pluscode is verplicht en leidend: altijd coördinaten afleiden uit pluscode
-          // lat/lng uit CSV zijn facultatief en worden alleen gebruikt als pluscode ontbreekt
           if (plus) {
             const d = decPlus(plus);
-            if (d) {
-              la = d.lat;
-              lo = d.lng;
-            }
+            if (d) { la = d.lat; lo = d.lng; }
           }
-          if (!isNum(la) || !isNum(lo)) {
-            // Geen pluscode én geen geldige lat/lng: rij overslaan
-            continue;
-          }
-          if (!plus) continue; // pluscode verplicht
+          if (!isNum(la) || !isNum(lo)) continue;
+          if (!plus) continue;
           const key = normPlus(plus) || `${la},${lo}`;
           const cat = get(ix.cat).trim();
           if (byPlus.has(key)) {
@@ -183,8 +195,7 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
           } else {
             byPlus.set(key, {
               id: uid(),
-              lat: la,
-              lng: lo,
+              lat: la, lng: lo,
               pluscode: plus || encPlus(la, lo),
               name: get(ix.name) || "POI",
               desc: get(ix.desc) || "",
@@ -194,14 +205,9 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
             });
           }
         }
-
         const imported = Array.from(byPlus.values());
-
-        // Samenvoegen met bestaande POIs op pluscode — geen duplicaten
         setPois((prev) => {
-          const existingByPlus = new Map(
-            prev.map((p) => [normPlus(p.pluscode), p])
-          );
+          const existingByPlus = new Map(prev.map((p) => [normPlus(p.pluscode), p]));
           const merged = [...prev];
           for (const p of imported) {
             const key = normPlus(p.pluscode);
@@ -215,10 +221,7 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
                 audioUrl: p.audioUrl || existing.audioUrl,
                 radius: p.radius || existing.radius,
                 categories: Array.from(
-                  new Set([
-                    ...(existing.categories || []),
-                    ...(p.categories || []),
-                  ])
+                  new Set([...(existing.categories || []), ...(p.categories || [])])
                 ),
               };
               merged[idx] = updated;
@@ -230,9 +233,7 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
           }
           return merged;
         });
-        addLog(
-          `CSV: ${imported.length} POIs geladen (${lines.length - 1} rijen)`
-        );
+        addLog(`CSV: ${imported.length} POIs geladen (${lines.length - 1} rijen)`);
       };
       rd.readAsText(file, "utf-8");
       e.target.value = "";
@@ -245,8 +246,7 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
     async (e) => {
       const files = Array.from(e.target.files);
       if (!files.length) return;
-      const linked = [],
-        updatedPois = [...pois];
+      const linked = [], updatedPois = [...pois];
       for (const f of files) {
         const ext = f.name.split(".").pop().toLowerCase();
         if (!["mp3", "wav"].includes(ext)) continue;
@@ -283,10 +283,7 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
       if (!file) return;
       const rd = new FileReader();
       rd.onload = (evt) => {
-        const xml = new DOMParser().parseFromString(
-          evt.target.result,
-          "text/xml"
-        );
+        const xml = new DOMParser().parseFromString(evt.target.result, "text/xml");
         const gpxName = file.name.replace(/\.gpx$/i, "");
         const hasRoute = xml.getElementsByTagName("rtept").length > 0;
         const hasTrack = xml.getElementsByTagName("trkpt").length > 0;
@@ -299,15 +296,11 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
             parseFloat(p.getAttribute("lon")),
           ]);
           if (pts.length) {
-            // Wis triggered entries voor route-POIs
             setTriggered((prev) => {
               const next = { ...prev };
               pois.forEach((p) => {
-                if (
-                  (p.categories || [])
-                    .map((c) => c.toLowerCase())
-                    .includes(gpxName.toLowerCase())
-                )
+                if ((p.categories || []).map((c) => c.toLowerCase())
+                  .includes(gpxName.toLowerCase()))
                   delete next[p.id];
               });
               return next;
@@ -315,7 +308,7 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
             setRoute(pts);
             setRouteName(gpxName);
             setRouteSessionId(uid());
-            addLog(`Route GPX: ${pts.length} punten — "${gpxName}"`);
+            addLog(`Route GPX (<rtept>): ${pts.length} waypoints — "${gpxName}"`);
           }
         } else {
           addLog(`GPX: geen route- of track-punten in ${file.name}`);
@@ -330,22 +323,16 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
   // ── Track accepteren (gpxWarn) ──────────────────────────────────────────
   const acceptGpxTrack = useCallback(() => {
     if (!gpxWarn) return;
-    const pts = Array.from(gpxWarn.xml.getElementsByTagName("trkpt")).map(
-      (p) => [
-        parseFloat(p.getAttribute("lat")),
-        parseFloat(p.getAttribute("lon")),
-      ]
-    );
+    const pts = Array.from(gpxWarn.xml.getElementsByTagName("trkpt")).map((p) => [
+      parseFloat(p.getAttribute("lat")),
+      parseFloat(p.getAttribute("lon")),
+    ]);
     if (pts.length) {
       const rn = gpxWarn.gpxName || gpxWarn.fileName.replace(/\.gpx$/i, "");
       setTriggered((prev) => {
         const next = { ...prev };
         pois.forEach((p) => {
-          if (
-            (p.categories || [])
-              .map((c) => c.toLowerCase())
-              .includes(rn.toLowerCase())
-          )
+          if ((p.categories || []).map((c) => c.toLowerCase()).includes(rn.toLowerCase()))
             delete next[p.id];
         });
         return next;
@@ -353,64 +340,132 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
       setRoute(pts);
       setRouteName(rn);
       setRouteSessionId(uid());
-      addLog(`Track GPX geaccepteerd: ${pts.length} punten — "${rn}"`);
+      addLog(`Track GPX geaccepteerd (<trkpt>): ${pts.length} punten — "${rn}"`);
     }
     setGpxWarn(null);
   }, [gpxWarn, pois, addLog, setTriggered]);
 
-  // ── Track opslaan als GPX ───────────────────────────────────────────────
+  // ── Track opslaan als GPX 1.1 ───────────────────────────────────────────
+  // Correct formaat: <trk> met <trkseg> en <trkpt> elementen
+  // Tijdstempel per punt indien beschikbaar, anders huidige tijd als basis
   const saveTrack = useCallback(async () => {
-    if (!track.length) {
-      addLog("Geen track");
-      return;
-    }
-    const pts = track
-      .map((p) => `<trkpt lat="${p[0]}" lon="${p[1]}"></trkpt>`)
-      .join("");
-    const gpx = `<?xml version="1.0" encoding="UTF-8"?><gpx version="1.1" creator="EuroPoi"><trk><n>Track ${new Date().toLocaleString()}</n><trkseg>${pts}</trkseg></trk></gpx>`;
-    const fileName = `track_${Date.now()}.gpx`;
+    if (!track.length) { addLog("Geen track om op te slaan"); return; }
 
-    // Capacitor APK: gebruik Filesystem + Share
-    const cap = window.Capacitor;
-    const isNative = cap?.isNativePlatform?.();
-    if (isNative && cap.Plugins?.Filesystem && cap.Plugins?.Share) {
-      try {
-        await cap.Plugins.Filesystem.writeFile({
-          path: fileName,
-          data: btoa(unescape(encodeURIComponent(gpx))),
-          directory: "CACHE",
-          encoding: null,
-        });
-        const { uri } = await cap.Plugins.Filesystem.getUri({
-          path: fileName,
-          directory: "CACHE",
-        });
-        await cap.Plugins.Share.share({
-          title: "EuroPoi track",
-          text: "GPS track opgeslagen",
-          url: uri,
-          dialogTitle: "Sla track op als…",
-        });
-        addLog(`Track opgeslagen: ${track.length} punten`);
-        return;
-      } catch (err) {
-        addLog(`Track opslaan fout: ${err.message}`);
-      }
-    }
+    const nu = new Date();
+    const trkPunten = track
+      .map((p, i) => {
+        // Schat tijdstempel: elk punt ~1 seconde na het vorige
+        const ts = new Date(nu.getTime() - (track.length - 1 - i) * 1000);
+        return `    <trkpt lat="${p[0].toFixed(7)}" lon="${p[1].toFixed(7)}">
+      <time>${ts.toISOString()}</time>
+    </trkpt>`;
+      })
+      .join("\n");
 
-    // Browser fallback
-    const a = Object.assign(document.createElement("a"), {
-      href: URL.createObjectURL(
-        new Blob([gpx], { type: "application/gpx+xml" })
-      ),
-      download: fileName,
-      style: "display:none",
+    const trackNaam = `EuroPoi Track ${nu.toLocaleDateString("nl-NL")} ${nu.toLocaleTimeString("nl-NL")}`;
+    const gpx = `${GPX_HEADER}
+  <trk>
+    <name>${trackNaam}</name>
+    <trkseg>
+${trkPunten}
+    </trkseg>
+  </trk>
+</gpx>`;
+
+    const bestandsNaam = `EuroPoi_track_${Date.now()}.gpx`;
+    await deelBestand({
+      inhoud: gpx,
+      bestandsNaam,
+      mimeType: "application/gpx+xml",
+      titel: "EuroPoi track",
+      tekst: `GPS track — ${track.length} punten`,
+      addLog,
     });
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => document.body.removeChild(a), 1000);
-    addLog(`Track opgeslagen: ${track.length} punten`);
+    addLog(`Track opgeslagen: ${track.length} punten (GPX 1.1 <trkpt>)`);
   }, [track, addLog]);
+
+  // ── GPX route exporteren (rte) ──────────────────────────────────────────
+  // Exporteert alle POIs van de actieve categorie (eerste categorie per POI)
+  // als GPX 1.1 route met <rtept> waypoints, gesorteerd via dichtstbijzijnde-buur.
+  // Startpunt: crosshair-positie indien actief, anders GPS-locatie, anders
+  // meest noordwestelijke POI als fallback.
+  const exportGpxRoute = useCallback(
+    async ({ selCats, loc, mapCenter, crosshairActive }) => {
+      // 1. Bepaal actieve categorie (eerste geselecteerde, of geen)
+      const actieveCategorie = selCats && selCats.length ? selCats[0] : null;
+      if (!actieveCategorie) {
+        addLog("GPX route: selecteer eerst een categorie via het filter");
+        return;
+      }
+
+      // 2. Filter POIs op eerste categorie
+      const geselecteerd = pois.filter(
+        (p) =>
+          isNum(p.lat) &&
+          isNum(p.lng) &&
+          p.categories &&
+          p.categories[0] === actieveCategorie
+      );
+      if (!geselecteerd.length) {
+        addLog(`GPX route: geen POIs gevonden voor categorie "${actieveCategorie}"`);
+        return;
+      }
+
+      // 3. Bepaal startpunt
+      // Voorkeur: crosshair-positie → GPS-locatie → meest noordwestelijke POI
+      let startLat, startLng;
+      if (crosshairActive && mapCenter && isNum(mapCenter.lat)) {
+        startLat = mapCenter.lat;
+        startLng = mapCenter.lng;
+        addLog(`GPX route: startpunt = crosshair (${startLat.toFixed(5)}, ${startLng.toFixed(5)})`);
+      } else if (loc && isNum(loc.lat)) {
+        startLat = loc.lat;
+        startLng = loc.lng;
+        addLog(`GPX route: startpunt = GPS-locatie`);
+      } else {
+        // Fallback: meest noordwestelijke POI (hoogste lat, laagste lng)
+        const nw = geselecteerd.reduce((best, p) =>
+          p.lat > best.lat || (p.lat === best.lat && p.lng < best.lng) ? p : best
+        );
+        startLat = nw.lat;
+        startLng = nw.lng;
+        addLog(`GPX route: startpunt = meest noordwestelijke POI (${nw.name})`);
+      }
+
+      // 4. Sorteer via dichtstbijzijnde-buur algoritme
+      const gesorteerd = sorteerDichtstbijzijndeBuur(geselecteerd, startLat, startLng);
+
+      // 5. Bouw GPX 1.1 route met <rtept> waypoints
+      // Naam: alleen de POI-naam, coördinaten als WGS84 decimaal (7 decimalen)
+      const rtePunten = gesorteerd
+        .map(
+          (p) => `  <rtept lat="${p.lat.toFixed(7)}" lon="${p.lng.toFixed(7)}">
+    <name>${p.name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</name>
+  </rtept>`
+        )
+        .join("\n");
+
+      const routeNaam = `EuroPoi — ${actieveCategorie}`;
+      const gpx = `${GPX_HEADER}
+  <rte>
+    <name>${routeNaam}</name>
+${rtePunten}
+  </rte>
+</gpx>`;
+
+      const bestandsNaam = `EuroPoi_route_${actieveCategorie}_${Date.now()}.gpx`;
+      await deelBestand({
+        inhoud: gpx,
+        bestandsNaam,
+        mimeType: "application/gpx+xml",
+        titel: `EuroPoi route — ${actieveCategorie}`,
+        tekst: `${gesorteerd.length} waypoints — geschikt voor Komoot, OsmAnd en andere routeplanners`,
+        addLog,
+      });
+      addLog(`GPX route geëxporteerd: ${gesorteerd.length} waypoints (<rtept>) — "${actieveCategorie}"`);
+    },
+    [pois, addLog]
+  );
 
   return {
     route,
@@ -429,5 +484,6 @@ export function useGpx({ pois, setPois, addLog, setTriggered, track }) {
     loadGpx,
     acceptGpxTrack,
     saveTrack,
+    exportGpxRoute,
   };
 }
