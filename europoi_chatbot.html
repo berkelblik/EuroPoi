@@ -252,9 +252,19 @@ GPX BESTANDEN:
 - Track = trkpt punten, opgenomen rijpad
 - GPX 1.1 standaard
 
+KOPPELING ROUTE AAN POI-CATEGORIE (belangrijk):
+- Wanneer je een GPX-routebestand importeert via het Route Menu, wordt de bestandsnaam van dat GPX-bestand gebruikt als routenaam
+- Als de bestandsnaam van het GPX-routebestand exact overeenkomt met een categorie-naam in je POI-collectie, worden ALLE POIs uit die categorie automatisch gekoppeld aan die route
+- Deze gekoppelde POIs worden getriggerd op het dichtstbijzijnde routepunt — de fysieke afstand tot de route doet er NIET toe
+- Dit verklaart waarom POIs soms op meer dan 500 meter van de route toch worden geactiveerd — ze behoren tot de categorie die overeenkomt met de routenaam
+- Voorbeeld: een GPX-bestand met de naam "Gelderland.gpx" triggert alle POIs met categorie "Gelderland" langs de route
+- De POIs verschijnen als blauwe markers op de kaart zodra een passende route is geladen
+- Dit is de primaire manier om een POI-groep te koppelen aan een specifieke route
+
 CATEGORIEËN:
 - Standaard: Horeca, Geschiedenis, Toeristisch, Cultureel, Natuur, Knooppunten, Overig
 - Eigen categorieën mogelijk via CSV
+- Categorie-naam = ook de koppeling met een GPX-routebestand (zie boven)
 
 VERVOERSMODI:
 - Wandelaar: standaard radius 30m
@@ -564,8 +574,7 @@ async function sendMessage(text) {
       headers: {
         "Content-Type": "application/json",
         "x-api-key": apiSleutel.trim(),
-        "anthropic-version": "2023-06-01",
-"anthropic-dangerous-direct-browser-access": "true"
+        "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, system: SYSTEM, messages })
     });
