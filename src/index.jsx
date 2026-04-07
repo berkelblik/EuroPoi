@@ -922,6 +922,7 @@ export default function App() {
           loc={safeLoc}
           tick={tick}
           onClose={toggleEco}
+          lang={lang}
         />
       )}
 
