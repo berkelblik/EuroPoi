@@ -252,9 +252,28 @@ GPX BESTANDEN:
 - Track = trkpt punten, opgenomen rijpad
 - GPX 1.1 standaard
 
+KOPPELING POIs AAN EEN ROUTE — ENIGE JUISTE WERKWIJZE:
+
+Vraag: "Hoe koppel ik mijn POIs aan een route?" of "Hoe koppel ik een set POIs aan een ingelezen route?"
+Antwoord: De koppeling werkt via de NAAM. De bestandsnaam van het GPX-routebestand moet exact overeenkomen met de categorie-naam van de POIs.
+
+Concreet:
+- POIs hebben in het CSV-bestand een categorie, bijv. categorie = "Veluwe"
+- Het GPX-routebestand moet dan "Veluwe.gpx" heten
+- Laad "Veluwe.gpx" in via Route Menu → GPX Route invoer
+- EuroPoi koppelt AUTOMATISCH alle POIs met categorie "Veluwe" aan die route
+- De POIs worden getriggerd op het dichtstbijzijnde routepunt tijdens het rijden
+
+De afstand van een POI tot de route speelt GEEN ROL bij de koppeling.
+De radius (30m/100m/160m) bepaalt alleen wanneer een routepunt wordt bereikt, niet welke POIs bij de route horen.
+De locatie (pluscode) van een POI bepaalt NIET of die POI aan de route wordt gekoppeld.
+
+Samenvatting in één zin: Zorg dat de naam van het GPX-routebestand exact overeenkomt met de categorie-naam van de POIs — dan is de koppeling automatisch.
+
 CATEGORIEËN:
 - Standaard: Horeca, Geschiedenis, Toeristisch, Cultureel, Natuur, Knooppunten, Overig
 - Eigen categorieën mogelijk via CSV
+- Categorie-naam = ook de koppeling met een GPX-routebestand (zie boven)
 
 VERVOERSMODI:
 - Wandelaar: standaard radius 30m
@@ -273,6 +292,33 @@ TALEN:
 
 ELEVENLABS:
 - Premium TTS via API-sleutel in instellingen
+
+STIJL EN OPMAAK — VERPLICHT BIJ ELK ANTWOORD:
+
+Je schrijft ALTIJD in goed gestructureerde tekst met witregels tussen alinea's. Nooit één grote lap tekst.
+
+Verplichte structuur per antwoord:
+1. Begin met één korte inleidende zin (max 15 woorden) die de kern samenvat.
+2. Gebruik daarna een witregel.
+3. Werk bij stappenplannen ALTIJD met genummerde stappen op aparte regels, elk voorafgegaan door "Stap X —"
+4. Gebruik bij opsommingen ALTIJD een streepje (-) aan het begin van elke regel, met een witregel erboven.
+5. Sluit af met een korte praktische tip op een aparte regel.
+
+Verboden:
+- NOOIT meer dan 3 zinnen achter elkaar zonder witregel
+- NOOIT markdown headers zoals ## of ###
+- NOOIT alles in één aaneengesloten blok tekst
+
+Voorbeeld van een GOED antwoord:
+"Je importeert POIs via het CSV-bestand en de IMPORT-knop.
+
+Stap 1 — Tik op de IMPORT knop in de app.
+Stap 2 — Selecteer je CSV-bestand op je telefoon.
+Stap 3 — De POIs verschijnen direct op de kaart.
+
+Tip: Zorg dat je CSV-bestand de juiste kolomnamen heeft: lat;lng;pluscode;name;desc;category;radius;mp3"
+
+Schrijf altijd zo — kort, overzichtelijk en goed leesbaar.
 
 GEDRAGSREGELS:
 - Beantwoord ALLEEN vragen over het gebruik van EuroPoi
@@ -503,6 +549,25 @@ function verwijderApi() {
 
 function scrollBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
 
+function renderMarkdown(tekst) {
+  return tekst
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    .replace(/`(.+?)`/g, "<code style='background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:12px'>$1</code>")
+    .split("\n")
+    .map(regel => {
+      const genummerd = regel.match(/^(\d+)\.\s(.+)/);
+      if (genummerd) return `<div style="margin:4px 0;padding-left:4px"><strong style="color:var(--brand2)">${genummerd[1]}.</strong> ${genummerd[2]}</div>`;
+      if (regel.match(/^#{1,3}\s/)) return `<div style="font-weight:600;margin:10px 0 4px;color:var(--text)">${regel.replace(/^#{1,3}\s/, "")}</div>`;
+      if (regel.match(/^[-•]\s/)) return `<div style="margin:3px 0;padding-left:12px">• ${regel.replace(/^[-•]\s/, "")}</div>`;
+      if (regel.match(/^Stap\s\d+/i)) return `<div style="margin:6px 0;padding:6px 10px;background:rgba(30,58,95,0.07);border-left:3px solid var(--brand2);border-radius:0 6px 6px 0">${regel}</div>`;
+      if (regel.trim() === "") return `<div style="height:8px"></div>`;
+      return `<div style="margin:2px 0">${regel}</div>`;
+    })
+    .join("");
+}
+
 function addMsg(role, text) {
   const wrap   = document.createElement("div");
   wrap.className = "msg " + (role === "user" ? "user" : "bot");
@@ -510,6 +575,8 @@ function addMsg(role, text) {
   bubble.className = "bubble";
   if (role === "bot" && text === null) {
     bubble.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  } else if (role === "bot") {
+    bubble.innerHTML = renderMarkdown(text);
   } else {
     bubble.textContent = text;
   }
@@ -564,16 +631,14 @@ async function sendMessage(text) {
       headers: {
         "Content-Type": "application/json",
         "x-api-key": apiSleutel.trim(),
-        "anthropic-version": "2023-06-01",
-"anthropic-dangerous-direct-browser-access": "true"
+        "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, system: SYSTEM, messages })
     });
 
     const data   = await resp.json();
     const answer = data.content?.[0]?.text || LANG[currentLang].fout || "Er ging iets mis. Probeer het opnieuw.";
-    loadingBubble.innerHTML  = "";
-    loadingBubble.textContent = answer;
+    loadingBubble.innerHTML = renderMarkdown(answer);
     history.push({ role: "assistant", content: answer });
     if (history.length > 24) history = history.slice(-24);
 
