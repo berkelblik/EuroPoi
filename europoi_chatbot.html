@@ -11,8 +11,8 @@
       --text: #1a1a1a; --text2: #555550; --text3: #888880;
       --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
       --radius-md: 8px; --radius-lg: 12px; --radius-xl: 16px;
-      --brand: #0A1628; --brand2: #1E3A5F; --accent: #ADD8E6;
-      --green: #1a7a4a; --amber: #b45309; --red: #b91c1c;
+      --brand: #0A1628; --brand2: #1E3A5F;
+      --green: #1a7a4a; --amber: #b45309;
     }
     @media (prefers-color-scheme: dark) {
       :root {
@@ -30,6 +30,8 @@
     .brand-name { font-size: 22px; font-weight: 500; color: var(--text); }
     .brand-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
     .chat-card { width: 100%; max-width: 680px; background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; display: flex; flex-direction: column; height: calc(100vh - 160px); min-height: 520px; max-height: 780px; }
+
+    /* HEADER */
     .chat-header { padding: 10px 16px; border-bottom: 0.5px solid var(--border); background: var(--bg2); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
     .chat-header-icon { width: 28px; height: 28px; border-radius: 7px; background: var(--brand); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .chat-header-icon svg { width: 15px; height: 15px; }
@@ -39,60 +41,53 @@
     .lang-btn { font-size: 10px; padding: 3px 6px; border-radius: 20px; border: 0.5px solid var(--border); background: transparent; color: var(--text2); cursor: pointer; font-family: inherit; }
     .lang-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
 
-    /* ── TEGOED BALK ── */
-    .tegoed-bar { padding: 8px 16px; border-bottom: 0.5px solid var(--border); background: var(--bg2); display: flex; align-items: center; gap: 10px; flex-shrink: 0; flex-wrap: wrap; gap: 6px; }
-    .tegoed-label { font-size: 11px; color: var(--text2); white-space: nowrap; }
-    .bolletjes { display: flex; gap: 5px; }
-    .bol { width: 10px; height: 10px; border-radius: 50%; transition: background 0.3s; }
-    .bol.vol { background: var(--green); }
-    .bol.leeg { background: var(--border2); }
-    .bol.laatste { background: var(--amber); }
-    .tegoed-spacer { flex: 1; }
-    .api-toggle { font-size: 11px; color: var(--brand2); cursor: pointer; text-decoration: underline; white-space: nowrap; background: none; border: none; font-family: inherit; }
+    /* API BALK */
+    .api-balk { padding: 8px 16px; border-bottom: 0.5px solid var(--border); background: var(--bg2); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .api-status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex-shrink: 0; }
+    .api-status-dot.actief { background: var(--green); }
+    .api-status-tekst { font-size: 11px; color: var(--text2); flex: 1; }
+    .api-toggle { font-size: 11px; color: var(--brand2); cursor: pointer; text-decoration: underline; background: none; border: none; font-family: inherit; white-space: nowrap; }
     .api-toggle:hover { color: var(--text); }
 
-    /* ── API INVOER PANEEL ── */
+    /* API PANEEL */
     .api-panel { padding: 10px 16px; border-bottom: 0.5px solid var(--border); background: var(--bg3); flex-shrink: 0; display: none; }
     .api-panel.open { display: block; }
     .api-panel-title { font-size: 11px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
     .api-input-row { display: flex; gap: 6px; }
     .api-input-row input { flex: 1; font-size: 12px; padding: 7px 10px; border-radius: var(--radius-md); border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); font-family: inherit; outline: none; }
     .api-input-row input:focus { border-color: var(--brand2); }
-    .api-save-btn { font-size: 11px; padding: 7px 12px; border-radius: var(--radius-md); border: none; background: var(--brand); color: #fff; cursor: pointer; white-space: nowrap; font-family: inherit; }
-    .api-save-btn:hover { opacity: 0.85; }
+    .api-save-btn { font-size: 11px; padding: 7px 12px; border-radius: var(--radius-md); border: none; background: var(--brand); color: #fff; cursor: pointer; font-family: inherit; }
     .api-clear-btn { font-size: 11px; padding: 7px 10px; border-radius: var(--radius-md); border: 0.5px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; font-family: inherit; }
-    .api-info { font-size: 10px; color: var(--text3); margin-top: 5px; }
+    .api-feedback { font-size: 11px; margin-top: 5px; color: var(--green); }
+    .api-info { font-size: 10px; color: var(--text3); margin-top: 4px; }
     .api-info a { color: var(--brand2); }
-    .api-status { font-size: 11px; margin-top: 4px; }
-    .api-status.ok { color: var(--green); }
-    .api-status.leeg-status { color: var(--text3); }
 
-    /* ── OP TEGOED LEEG MELDING ── */
-    .tegoed-leeg-msg { margin: 12px 16px; padding: 12px 14px; border-radius: var(--radius-lg); background: rgba(180,83,9,0.08); border: 0.5px solid rgba(180,83,9,0.25); font-size: 12px; color: var(--amber); line-height: 1.6; display: none; flex-shrink: 0; }
-    .tegoed-leeg-msg.zichtbaar { display: block; }
-    .tegoed-leeg-msg a { color: var(--brand2); }
+    /* GEEN SLEUTEL MELDING */
+    .geen-sleutel-msg { margin: 12px 16px; padding: 12px 14px; border-radius: var(--radius-lg); background: rgba(180,83,9,0.07); border: 0.5px solid rgba(180,83,9,0.22); font-size: 12px; color: var(--amber); line-height: 1.65; display: none; flex-shrink: 0; }
+    .geen-sleutel-msg.zichtbaar { display: block; }
+    .geen-sleutel-msg a { color: var(--brand2); }
 
-    /* ── MESSAGES ── */
+    /* MESSAGES */
     .messages { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
     .msg { max-width: 88%; display: flex; flex-direction: column; }
     .msg.user { align-self: flex-end; }
-    .msg.bot { align-self: flex-start; }
+    .msg.bot  { align-self: flex-start; }
     .bubble { padding: 9px 13px; border-radius: var(--radius-lg); font-size: 13px; line-height: 1.65; }
     .user .bubble { background: var(--brand); color: #fff; border-bottom-right-radius: 3px; }
-    .bot .bubble { background: var(--bg2); color: var(--text); border: 0.5px solid var(--border); border-bottom-left-radius: 3px; }
+    .bot  .bubble { background: var(--bg2); color: var(--text); border: 0.5px solid var(--border); border-bottom-left-radius: 3px; }
     .typing { display: flex; gap: 4px; align-items: center; padding: 10px 13px; }
     .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); animation: blink 1.2s infinite; }
     .dot:nth-child(2) { animation-delay: 0.2s; }
     .dot:nth-child(3) { animation-delay: 0.4s; }
     @keyframes blink { 0%,80%,100% { opacity: 0.3; } 40% { opacity: 1; } }
 
-    /* ── SUGGESTIONS ── */
+    /* SUGGESTIONS */
     .sugs { padding: 7px 12px; display: flex; gap: 5px; flex-wrap: wrap; border-top: 0.5px solid var(--border); background: var(--bg2); flex-shrink: 0; }
     .sug { font-size: 11px; padding: 4px 9px; border-radius: 20px; border: 0.5px solid var(--border2); background: var(--bg); color: var(--text2); cursor: pointer; white-space: nowrap; font-family: inherit; }
     .sug:hover { background: var(--bg3); color: var(--text); }
     .sug:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* ── INPUT ROW ── */
+    /* INPUT */
     .input-row { display: flex; gap: 8px; padding: 10px 14px; border-top: 0.5px solid var(--border); background: var(--bg); flex-shrink: 0; }
     .input-row textarea { flex: 1; font-size: 13px; padding: 8px 11px; border-radius: var(--radius-md); border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); resize: none; height: 38px; font-family: inherit; line-height: 1.5; outline: none; }
     .input-row textarea:focus { border-color: var(--brand2); }
@@ -100,6 +95,7 @@
     .send-btn { width: 38px; height: 38px; border-radius: var(--radius-md); border: none; background: var(--brand); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .send-btn:hover { opacity: 0.85; }
     .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
     .page-footer { margin-top: 14px; font-size: 11px; color: var(--text3); text-align: center; }
     .page-footer a { color: var(--text2); text-decoration: none; }
     @media (max-width: 480px) {
@@ -146,34 +142,33 @@
       </div>
     </div>
 
-    <!-- TEGOED BALK -->
-    <div class="tegoed-bar">
-      <span class="tegoed-label" id="tegoed-label">Gratis tegoed:</span>
-      <div class="bolletjes" id="bolletjes"></div>
-      <div class="tegoed-spacer"></div>
-      <button class="api-toggle" id="api-toggle" onclick="toggleApiPanel()">Eigen API-sleutel gebruiken</button>
+    <!-- API STATUSBALK -->
+    <div class="api-balk">
+      <div class="api-status-dot" id="api-dot"></div>
+      <span class="api-status-tekst" id="api-status-tekst"></span>
+      <button class="api-toggle" id="api-toggle-btn" onclick="toggleApiPanel()"></button>
     </div>
 
-    <!-- API INVOER PANEEL -->
+    <!-- API INVOERPANEEL -->
     <div class="api-panel" id="api-panel">
-      <div class="api-panel-title" id="api-panel-title">Voer je Anthropic API-sleutel in voor onbeperkt gebruik</div>
+      <div class="api-panel-title" id="api-panel-title"></div>
       <div class="api-input-row">
         <input type="password" id="api-key-input" placeholder="sk-ant-..." />
-        <button class="api-save-btn" onclick="slaApiSleutelOp()">Opslaan</button>
-        <button class="api-clear-btn" id="api-clear-btn" onclick="verwijderApiSleutel()" style="display:none">Verwijder</button>
+        <button class="api-save-btn" id="api-save-btn" onclick="slaApiOp()"></button>
+        <button class="api-clear-btn" id="api-clear-btn" onclick="verwijderApi()" style="display:none"></button>
       </div>
-      <div class="api-status leeg-status" id="api-status"></div>
-      <div class="api-info">Sleutel aanschaffen via <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · Sleutel wordt alleen lokaal opgeslagen in je browser</div>
+      <div class="api-feedback" id="api-feedback" style="display:none"></div>
+      <div class="api-info" id="api-info"></div>
     </div>
 
-    <!-- TEGOED LEEG MELDING -->
-    <div class="tegoed-leeg-msg" id="tegoed-leeg-msg"></div>
+    <!-- GEEN SLEUTEL MELDING (onder chatvenster) -->
+    <div class="geen-sleutel-msg" id="geen-sleutel-msg"></div>
 
     <div class="messages" id="messages"></div>
     <div class="sugs" id="sugs"></div>
 
     <div class="input-row">
-      <textarea id="user-input" placeholder="Stel je vraag..." rows="1"></textarea>
+      <textarea id="user-input" rows="1"></textarea>
       <button class="send-btn" id="send-btn" disabled>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -192,9 +187,7 @@
 </div>
 
 <script>
-const MAX_GRATIS = 3;
-const OPSLAG_TEGOED = "ep_gratis_gebruikt";
-const OPSLAG_API    = "ep_api_key";
+const OPSLAG_API = "ep_api_key";
 
 const SYSTEM = `Je bent de officiële EuroPoi assistent. EuroPoi is een Progressive Web App (PWA) voor buitensporters (fietsers, wandelaars, motorrijders) die audiocommentaar geeft bij het passeren van Points of Interest (POIs).
 
@@ -288,18 +281,22 @@ GEDRAGSREGELS:
 - Houd antwoorden beknopt en praktisch
 - Geef concrete stappen bij how-to vragen`;
 
-const LANG_DATA = {
+const LANG = {
   nl: {
-    welcome: "Hallo! Ik ben de EuroPoi assistent. Je hebt 3 gratis vragen. Stel me een vraag over het gebruik van de app — zoals CSV aanmaken, POIs importeren of audio instellen.",
+    welcome: "Hallo! Ik ben de EuroPoi assistent. Voer je Anthropic API-sleutel in om vragen te stellen over het gebruik van de app.",
     placeholder: "Stel je vraag...",
     sub: "Stel je vraag over het gebruik van EuroPoi",
-    tLabel: "Gratis tegoed:",
-    tLeeg: "Je gratis tegoed is op. Voer een eigen Anthropic API-sleutel in voor onbeperkt gebruik. Een sleutel aanschaffen kost slechts enkele centen per gesprek. → <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a>",
-    tApiOk: "API-sleutel actief — onbeperkt vragen stellen",
-    tApiToggle: "Eigen API-sleutel gebruiken",
-    tApiPanelTitle: "Voer je Anthropic API-sleutel in voor onbeperkt gebruik",
-    tApiStatus: "Sleutel opgeslagen ✓",
-    tApiVerwijderd: "Sleutel verwijderd",
+    geenSleutel: "Om vragen te stellen heb je een eigen Anthropic API-sleutel nodig. Een sleutel kost slechts enkele centen per gesprek en is gratis aan te maken via <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a>. Voer je sleutel in via de knop hierboven.",
+    statusZonder: "Geen API-sleutel — vragen stellen niet mogelijk",
+    statusMet: "API-sleutel actief — vragen stellen mogelijk",
+    toggleZonder: "Sleutel invoeren",
+    toggleMet: "Sleutel beheren",
+    panelTitel: "Anthropic API-sleutel invoeren",
+    opslaan: "Opslaan",
+    verwijder: "Verwijder",
+    opgeslagen: "Sleutel opgeslagen ✓",
+    verwijderd: "Sleutel verwijderd",
+    info: "Sleutel aanschaffen via <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a> · Wordt alleen lokaal in je browser bewaard",
     sugs: [
       { label: "CSV aanmaken",      q: "Hoe maak ik een CSV-bestand aan voor EuroPoi?" },
       { label: "Pluscode opzoeken", q: "Wat is een pluscode en hoe zoek ik die op?" },
@@ -309,16 +306,20 @@ const LANG_DATA = {
     ]
   },
   en: {
-    welcome: "Hello! I'm the EuroPoi assistant. You have 3 free questions. Ask me anything about using the app — like creating a CSV file, importing POIs, or setting up audio.",
+    welcome: "Hello! I'm the EuroPoi assistant. Enter your Anthropic API key to ask questions about using the app.",
     placeholder: "Ask your question...",
     sub: "Ask your question about EuroPoi",
-    tLabel: "Free credits:",
-    tLeeg: "Your free credits are used up. Enter your own Anthropic API key for unlimited use. A key costs only a few cents per conversation. → <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a>",
-    tApiOk: "API key active — unlimited questions",
-    tApiToggle: "Use own API key",
-    tApiPanelTitle: "Enter your Anthropic API key for unlimited use",
-    tApiStatus: "Key saved ✓",
-    tApiVerwijderd: "Key removed",
+    geenSleutel: "To ask questions you need your own Anthropic API key. A key costs only a few cents per conversation and is free to create at <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a>. Enter your key using the button above.",
+    statusZonder: "No API key — questions not possible",
+    statusMet: "API key active — ready to answer questions",
+    toggleZonder: "Enter key",
+    toggleMet: "Manage key",
+    panelTitel: "Enter Anthropic API key",
+    opslaan: "Save",
+    verwijder: "Remove",
+    opgeslagen: "Key saved ✓",
+    verwijderd: "Key removed",
+    info: "Get a key at <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a> · Stored locally in your browser only",
     sugs: [
       { label: "Create CSV",     q: "How do I create a CSV file for EuroPoi?" },
       { label: "Find pluscode",  q: "What is a pluscode and how do I find one?" },
@@ -328,16 +329,20 @@ const LANG_DATA = {
     ]
   },
   de: {
-    welcome: "Hallo! Ich bin der EuroPoi-Assistent. Du hast 3 kostenlose Fragen. Stelle mir Fragen zur Nutzung der App.",
+    welcome: "Hallo! Ich bin der EuroPoi-Assistent. Gib deinen Anthropic API-Schlüssel ein, um Fragen zur App zu stellen.",
     placeholder: "Stelle deine Frage...",
     sub: "Stelle deine Frage zur Nutzung von EuroPoi",
-    tLabel: "Kostenloses Guthaben:",
-    tLeeg: "Dein kostenloses Guthaben ist aufgebraucht. Gib einen eigenen Anthropic API-Schlüssel ein. → <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a>",
-    tApiOk: "API-Schlüssel aktiv — unbegrenzte Fragen",
-    tApiToggle: "Eigenen API-Schlüssel verwenden",
-    tApiPanelTitle: "Gib deinen Anthropic API-Schlüssel ein",
-    tApiStatus: "Schlüssel gespeichert ✓",
-    tApiVerwijderd: "Schlüssel entfernt",
+    geenSleutel: "Um Fragen zu stellen, benötigst du einen eigenen Anthropic API-Schlüssel. Ein Schlüssel kostet nur wenige Cent pro Gespräch. Erhältlich unter <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a>.",
+    statusZonder: "Kein API-Schlüssel — Fragen nicht möglich",
+    statusMet: "API-Schlüssel aktiv — Fragen möglich",
+    toggleZonder: "Schlüssel eingeben",
+    toggleMet: "Schlüssel verwalten",
+    panelTitel: "Anthropic API-Schlüssel eingeben",
+    opslaan: "Speichern",
+    verwijder: "Entfernen",
+    opgeslagen: "Schlüssel gespeichert ✓",
+    verwijderd: "Schlüssel entfernt",
+    info: "Schlüssel erhältlich unter <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a> · Wird nur lokal gespeichert",
     sugs: [
       { label: "CSV erstellen",    q: "Wie erstelle ich eine CSV-Datei für EuroPoi?" },
       { label: "Pluscode finden",  q: "Was ist ein Pluscode und wie finde ich ihn?" },
@@ -347,16 +352,20 @@ const LANG_DATA = {
     ]
   },
   fr: {
-    welcome: "Bonjour! Je suis l'assistant EuroPoi. Vous avez 3 questions gratuites. Posez-moi des questions sur l'utilisation de l'app.",
+    welcome: "Bonjour! Je suis l'assistant EuroPoi. Entrez votre clé API Anthropic pour poser des questions sur l'application.",
     placeholder: "Posez votre question...",
     sub: "Posez votre question sur l'utilisation d'EuroPoi",
-    tLabel: "Crédit gratuit:",
-    tLeeg: "Votre crédit gratuit est épuisé. Entrez votre propre clé API Anthropic. → <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a>",
-    tApiOk: "Clé API active — questions illimitées",
-    tApiToggle: "Utiliser ma propre clé API",
-    tApiPanelTitle: "Entrez votre clé API Anthropic",
-    tApiStatus: "Clé enregistrée ✓",
-    tApiVerwijderd: "Clé supprimée",
+    geenSleutel: "Pour poser des questions, vous avez besoin de votre propre clé API Anthropic. Une clé coûte quelques centimes par conversation. Disponible sur <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a>.",
+    statusZonder: "Pas de clé API — questions impossibles",
+    statusMet: "Clé API active — questions possibles",
+    toggleZonder: "Entrer la clé",
+    toggleMet: "Gérer la clé",
+    panelTitel: "Entrer la clé API Anthropic",
+    opslaan: "Enregistrer",
+    verwijder: "Supprimer",
+    opgeslagen: "Clé enregistrée ✓",
+    verwijderd: "Clé supprimée",
+    info: "Obtenez une clé sur <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a> · Stockée uniquement localement",
     sugs: [
       { label: "Créer CSV",        q: "Comment créer un fichier CSV pour EuroPoi?" },
       { label: "Trouver pluscode", q: "Qu'est-ce qu'un pluscode et comment le trouver?" },
@@ -366,16 +375,20 @@ const LANG_DATA = {
     ]
   },
   es: {
-    welcome: "¡Hola! Soy el asistente de EuroPoi. Tienes 3 preguntas gratuitas. Hazme preguntas sobre el uso de la app.",
+    welcome: "¡Hola! Soy el asistente de EuroPoi. Introduce tu clave API de Anthropic para hacer preguntas sobre la app.",
     placeholder: "Haz tu pregunta...",
     sub: "Haz tu pregunta sobre el uso de EuroPoi",
-    tLabel: "Crédito gratuito:",
-    tLeeg: "Tu crédito gratuito se ha agotado. Introduce tu propia clave API de Anthropic. → <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a>",
-    tApiOk: "Clave API activa — preguntas ilimitadas",
-    tApiToggle: "Usar mi propia clave API",
-    tApiPanelTitle: "Introduce tu clave API de Anthropic",
-    tApiStatus: "Clave guardada ✓",
-    tApiVerwijderd: "Clave eliminada",
+    geenSleutel: "Para hacer preguntas necesitas tu propia clave API de Anthropic. Cuesta solo unos céntimos por conversación. Disponible en <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a>.",
+    statusZonder: "Sin clave API — preguntas no disponibles",
+    statusMet: "Clave API activa — preguntas disponibles",
+    toggleZonder: "Introducir clave",
+    toggleMet: "Gestionar clave",
+    panelTitel: "Introducir clave API de Anthropic",
+    opslaan: "Guardar",
+    verwijder: "Eliminar",
+    opgeslagen: "Clave guardada ✓",
+    verwijderd: "Clave eliminada",
+    info: "Obtén una clave en <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a> · Solo se guarda localmente",
     sugs: [
       { label: "Crear CSV",       q: "¿Cómo creo un archivo CSV para EuroPoi?" },
       { label: "Buscar pluscode", q: "¿Qué es un pluscode y cómo lo encuentro?" },
@@ -385,16 +398,20 @@ const LANG_DATA = {
     ]
   },
   it: {
-    welcome: "Ciao! Sono l'assistente EuroPoi. Hai 3 domande gratuite. Fai domande sull'uso dell'app.",
+    welcome: "Ciao! Sono l'assistente EuroPoi. Inserisci la tua chiave API Anthropic per fare domande sull'app.",
     placeholder: "Fai la tua domanda...",
     sub: "Fai la tua domanda sull'uso di EuroPoi",
-    tLabel: "Credito gratuito:",
-    tLeeg: "Il tuo credito gratuito è esaurito. Inserisci la tua chiave API Anthropic. → <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a>",
-    tApiOk: "Chiave API attiva — domande illimitate",
-    tApiToggle: "Usa la mia chiave API",
-    tApiPanelTitle: "Inserisci la tua chiave API Anthropic",
-    tApiStatus: "Chiave salvata ✓",
-    tApiVerwijderd: "Chiave rimossa",
+    geenSleutel: "Per fare domande hai bisogno della tua chiave API Anthropic. Costa solo pochi centesimi per conversazione. Disponibile su <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a>.",
+    statusZonder: "Nessuna chiave API — domande non disponibili",
+    statusMet: "Chiave API attiva — domande disponibili",
+    toggleZonder: "Inserisci chiave",
+    toggleMet: "Gestisci chiave",
+    panelTitel: "Inserisci chiave API Anthropic",
+    opslaan: "Salva",
+    verwijder: "Rimuovi",
+    opgeslagen: "Chiave salvata ✓",
+    verwijderd: "Chiave rimossa",
+    info: "Ottieni una chiave su <a href='https://console.anthropic.com' target='_blank'>console.anthropic.com</a> · Salvata solo localmente",
     sugs: [
       { label: "Creare CSV",       q: "Come creo un file CSV per EuroPoi?" },
       { label: "Trovare pluscode", q: "Cos'è un pluscode e come lo trovo?" },
@@ -405,106 +422,86 @@ const LANG_DATA = {
   }
 };
 
-let history      = [];
-let currentLang  = "nl";
-let busy         = false;
-let gratisGebruikt = parseInt(localStorage.getItem(OPSLAG_TEGOED) || "0");
-let apiSleutel   = localStorage.getItem(OPSLAG_API) || "";
+let history     = [];
+let currentLang = "nl";
+let busy        = false;
+let apiSleutel  = localStorage.getItem(OPSLAG_API) || "";
 
-const messagesEl   = document.getElementById("messages");
-const inputEl      = document.getElementById("user-input");
-const sendBtn      = document.getElementById("send-btn");
-const sugsEl       = document.getElementById("sugs");
-const headerSub    = document.getElementById("header-sub");
-const bolletjesEl  = document.getElementById("bolletjes");
-const tLabel       = document.getElementById("tegoed-label");
-const apiPanel     = document.getElementById("api-panel");
-const apiToggleBtn = document.getElementById("api-toggle");
-const apiKeyInput  = document.getElementById("api-key-input");
-const apiStatus    = document.getElementById("api-status");
-const apiClearBtn  = document.getElementById("api-clear-btn");
-const leegMsg      = document.getElementById("tegoed-leeg-msg");
+const messagesEl  = document.getElementById("messages");
+const inputEl     = document.getElementById("user-input");
+const sendBtn     = document.getElementById("send-btn");
+const sugsEl      = document.getElementById("sugs");
+const headerSub   = document.getElementById("header-sub");
+const apiDot      = document.getElementById("api-dot");
+const apiStatusT  = document.getElementById("api-status-tekst");
+const apiToggleB  = document.getElementById("api-toggle-btn");
+const apiPanel    = document.getElementById("api-panel");
+const apiKeyInput = document.getElementById("api-key-input");
+const apiSaveBtn  = document.getElementById("api-save-btn");
+const apiClearBtn = document.getElementById("api-clear-btn");
+const apiFeedback = document.getElementById("api-feedback");
+const apiInfo     = document.getElementById("api-info");
+const apiPanelTit = document.getElementById("api-panel-title");
+const geenMsg     = document.getElementById("geen-sleutel-msg");
 
-function scrollBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
+function heeftSleutel() { return apiSleutel.trim().length > 10; }
 
-function heeftTegoed() {
-  return apiSleutel.trim().length > 10 || gratisGebruikt < MAX_GRATIS;
-}
-
-function updateBolletjes() {
-  const d = LANG_DATA[currentLang];
-  bolletjesEl.innerHTML = "";
-  if (apiSleutel.trim().length > 10) {
-    tLabel.textContent = d.tApiOk;
-    tLabel.style.color = "var(--green)";
-    bolletjesEl.innerHTML = "∞";
-    bolletjesEl.style.color = "var(--green)";
-    bolletjesEl.style.fontSize = "14px";
-    bolletjesEl.style.fontWeight = "500";
-    leegMsg.classList.remove("zichtbaar");
+function updateUI() {
+  const d = LANG[currentLang];
+  if (heeftSleutel()) {
+    apiDot.classList.add("actief");
+    apiStatusT.textContent = d.statusMet;
+    apiToggleB.textContent  = d.toggleMet;
+    geenMsg.classList.remove("zichtbaar");
+    inputEl.disabled = false;
+    inputEl.placeholder = d.placeholder;
+    apiClearBtn.style.display = "inline-block";
+    apiKeyInput.value = apiSleutel;
   } else {
-    tLabel.textContent = d.tLabel;
-    tLabel.style.color = "";
-    bolletjesEl.style.color = "";
-    bolletjesEl.style.fontSize = "";
-    bolletjesEl.style.fontWeight = "";
-    const resterend = MAX_GRATIS - gratisGebruikt;
-    for (let i = 0; i < MAX_GRATIS; i++) {
-      const bol = document.createElement("div");
-      bol.className = "bol";
-      if (i < resterend) {
-        bol.classList.add(resterend === 1 ? "laatste" : "vol");
-      } else {
-        bol.classList.add("leeg");
-      }
-      bolletjesEl.appendChild(bol);
-    }
-    if (resterend <= 0) {
-      leegMsg.innerHTML = d.tLeeg;
-      leegMsg.classList.add("zichtbaar");
-      inputEl.disabled = true;
-      sendBtn.disabled = true;
-      sugsEl.querySelectorAll(".sug").forEach(s => s.disabled = true);
-    } else {
-      leegMsg.classList.remove("zichtbaar");
-      inputEl.disabled = false;
-    }
+    apiDot.classList.remove("actief");
+    apiStatusT.textContent = d.statusZonder;
+    apiToggleB.textContent  = d.toggleZonder;
+    geenMsg.innerHTML = d.geenSleutel;
+    geenMsg.classList.add("zichtbaar");
+    inputEl.disabled = true;
+    inputEl.placeholder = d.placeholder;
+    apiClearBtn.style.display = "none";
+    sendBtn.disabled = true;
   }
-  apiToggleBtn.textContent = d.tApiToggle;
+  apiPanelTit.textContent  = d.panelTitel;
+  apiSaveBtn.textContent   = d.opslaan;
+  apiClearBtn.textContent  = d.verwijder;
+  apiInfo.innerHTML        = d.info;
 }
 
 function toggleApiPanel() {
   apiPanel.classList.toggle("open");
-  if (apiPanel.classList.contains("open") && apiSleutel) {
-    apiKeyInput.value = apiSleutel;
-    apiClearBtn.style.display = "inline-block";
-    apiStatus.textContent = LANG_DATA[currentLang].tApiStatus;
-    apiStatus.className = "api-status ok";
-  }
+  apiFeedback.style.display = "none";
 }
 
-function slaApiSleutelOp() {
+function slaApiOp() {
   const val = apiKeyInput.value.trim();
   if (!val || val.length < 10) return;
   apiSleutel = val;
   localStorage.setItem(OPSLAG_API, val);
-  apiStatus.textContent = LANG_DATA[currentLang].tApiStatus;
-  apiStatus.className = "api-status ok";
-  apiClearBtn.style.display = "inline-block";
-  inputEl.disabled = false;
-  sendBtn.disabled = !inputEl.value.trim();
-  updateBolletjes();
+  apiFeedback.textContent = LANG[currentLang].opgeslagen;
+  apiFeedback.style.display = "block";
+  setTimeout(() => { apiFeedback.style.display = "none"; }, 2500);
+  updateUI();
 }
 
-function verwijderApiSleutel() {
+function verwijderApi() {
   apiSleutel = "";
   localStorage.removeItem(OPSLAG_API);
   apiKeyInput.value = "";
-  apiClearBtn.style.display = "none";
-  apiStatus.textContent = LANG_DATA[currentLang].tApiVerwijderd;
-  apiStatus.className = "api-status leeg-status";
-  updateBolletjes();
+  apiFeedback.textContent = LANG[currentLang].verwijderd;
+  apiFeedback.style.display = "block";
+  setTimeout(() => { apiFeedback.style.display = "none"; }, 2500);
+  apiPanel.classList.remove("open");
+  updateUI();
 }
+
+function scrollBottom() { messagesEl.scrollTop = messagesEl.scrollHeight; }
 
 function addMsg(role, text) {
   const wrap   = document.createElement("div");
@@ -524,22 +521,21 @@ function addMsg(role, text) {
 
 function setLang(lang) {
   currentLang = lang;
-  const d = LANG_DATA[lang];
+  const d = LANG[lang];
   document.querySelectorAll(".lang-btn").forEach(b => b.classList.toggle("active", b.dataset.lang === lang));
   headerSub.textContent = d.sub;
-  inputEl.placeholder   = d.placeholder;
-  document.getElementById("api-panel-title").textContent = d.tApiPanelTitle;
   renderSugs(lang);
-  updateBolletjes();
+  updateUI();
 }
 
 function renderSugs(lang) {
   sugsEl.innerHTML = "";
-  LANG_DATA[lang].sugs.forEach(s => {
+  LANG[lang].sugs.forEach(s => {
     const btn = document.createElement("button");
     btn.className   = "sug";
     btn.textContent = s.label;
-    btn.onclick     = () => { if (!busy && heeftTegoed()) sendMessage(s.q); };
+    btn.disabled    = !heeftSleutel();
+    btn.onclick     = () => { if (!busy && heeftSleutel()) sendMessage(s.q); };
     sugsEl.appendChild(btn);
   });
 }
@@ -549,7 +545,7 @@ document.querySelectorAll(".lang-btn").forEach(btn => {
 });
 
 async function sendMessage(text) {
-  if (!text.trim() || busy || !heeftTegoed()) return;
+  if (!text.trim() || busy || !heeftSleutel()) return;
   busy = true;
   sendBtn.disabled = true;
   inputEl.value = "";
@@ -562,34 +558,31 @@ async function sendMessage(text) {
     const langNames = { nl:"Nederlands", en:"English", de:"Deutsch", fr:"Français", es:"Español", it:"Italiano" };
     const langNote  = `\n\n[Antwoord in het ${langNames[currentLang] || "Nederlands"}]`;
     const messages  = [...history.slice(0, -1), { role: "user", content: text + langNote }];
-    const headers   = { "Content-Type": "application/json", "anthropic-version": "2023-06-01" };
-    if (apiSleutel.trim().length > 10) headers["x-api-key"] = apiSleutel.trim();
 
     const resp = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers,
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiSleutel.trim(),
+        "anthropic-version": "2023-06-01"
+      },
       body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, system: SYSTEM, messages })
     });
 
     const data   = await resp.json();
-    const answer = data.content?.[0]?.text || "Er ging iets mis. Probeer het opnieuw.";
-    loadingBubble.innerHTML = "";
+    const answer = data.content?.[0]?.text || LANG[currentLang].fout || "Er ging iets mis. Probeer het opnieuw.";
+    loadingBubble.innerHTML  = "";
     loadingBubble.textContent = answer;
     history.push({ role: "assistant", content: answer });
     if (history.length > 24) history = history.slice(-24);
 
-    if (!apiSleutel.trim()) {
-      gratisGebruikt++;
-      localStorage.setItem(OPSLAG_TEGOED, gratisGebruikt);
-      updateBolletjes();
-    }
   } catch {
-    loadingBubble.innerHTML = "";
+    loadingBubble.innerHTML  = "";
     loadingBubble.textContent = "Verbindingsfout. Controleer je internetverbinding en probeer opnieuw.";
   }
 
   busy = false;
-  if (heeftTegoed()) sendBtn.disabled = !inputEl.value.trim();
+  if (heeftSleutel()) sendBtn.disabled = !inputEl.value.trim();
   scrollBottom();
 }
 
@@ -598,16 +591,11 @@ inputEl.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(inputEl.value); }
 });
 inputEl.addEventListener("input", () => {
-  sendBtn.disabled = !inputEl.value.trim() || busy || !heeftTegoed();
+  sendBtn.disabled = !inputEl.value.trim() || busy || !heeftSleutel();
 });
 
 setLang("nl");
-if (apiSleutel) {
-  apiKeyInput.value  = apiSleutel;
-  apiClearBtn.style.display = "inline-block";
-}
-addMsg("bot", LANG_DATA.nl.welcome);
-updateBolletjes();
+addMsg("bot", LANG.nl.welcome);
 </script>
 </body>
 </html>
