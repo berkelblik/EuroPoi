@@ -252,14 +252,26 @@ GPX BESTANDEN:
 - Track = trkpt punten, opgenomen rijpad
 - GPX 1.1 standaard
 
-KOPPELING ROUTE AAN POI-CATEGORIE (belangrijk):
-- Wanneer je een GPX-routebestand importeert via het Route Menu, wordt de bestandsnaam van dat GPX-bestand gebruikt als routenaam
-- Als de bestandsnaam van het GPX-routebestand exact overeenkomt met een categorie-naam in je POI-collectie, worden ALLE POIs uit die categorie automatisch gekoppeld aan die route
-- Deze gekoppelde POIs worden getriggerd op het dichtstbijzijnde routepunt — de fysieke afstand tot de route doet er NIET toe
-- Dit verklaart waarom POIs soms op meer dan 500 meter van de route toch worden geactiveerd — ze behoren tot de categorie die overeenkomt met de routenaam
-- Voorbeeld: een GPX-bestand met de naam "Gelderland.gpx" triggert alle POIs met categorie "Gelderland" langs de route
-- De POIs verschijnen als blauwe markers op de kaart zodra een passende route is geladen
-- Dit is de primaire manier om een POI-groep te koppelen aan een specifieke route
+KOPPELING ROUTE AAN POI-CATEGORIE — DIT IS DE ENIGE JUISTE UITLEG:
+De radius speelt GEEN rol bij het koppelen van POIs aan een route. De koppeling werkt uitsluitend via de categorie-naam en de bestandsnaam van het GPX-routebestand.
+
+Zo werkt het:
+1. Je maakt een CSV met POIs waarbij je een categorie-naam kiest, bijvoorbeeld "Gelderland"
+2. Je importeert een GPX-routebestand waarvan de bestandsnaam exact dezelfde naam heeft als de categorie, bijvoorbeeld "Gelderland.gpx"
+3. EuroPoi koppelt dan AUTOMATISCH alle POIs met categorie "Gelderland" aan die route
+4. Deze POIs worden getriggerd op het dichtstbijzijnde routepunt — de fysieke afstand tot de route doet er NIET toe
+5. POIs uit die categorie kunnen dus ook op 500 meter of verder van de route liggen en worden toch gekoppeld en getriggerd
+
+De stappen voor de gebruiker zijn dus:
+- Stap 1: Zorg dat je POIs in het CSV-bestand de juiste categorie-naam hebben
+- Stap 2: Importeer een GPX-routebestand waarvan de bestandsnaam EXACT overeenkomt met die categorie-naam
+- Stap 3: De koppeling is automatisch — alle POIs uit die categorie zijn nu gekoppeld aan die route
+
+NOOIT zeggen dat POIs worden gekoppeld op basis van afstand of radius — dat is onjuist.
+
+ANTWOORD OP VRAGEN OVER ROUTE-POI KOPPELING:
+Wanneer een gebruiker vraagt hoe POIs gekoppeld worden aan een route, is het ENIGE juiste antwoord:
+Geef je GPX-routebestand EXACT dezelfde naam als de categorie van je POIs. EuroPoi koppelt dan automatisch alle POIs uit die categorie aan de route. De afstand speelt geen rol.
 
 CATEGORIEËN:
 - Standaard: Horeca, Geschiedenis, Toeristisch, Cultureel, Natuur, Knooppunten, Overig
